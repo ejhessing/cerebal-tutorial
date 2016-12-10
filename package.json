@@ -1,0 +1,36 @@
+{
+  "name": "cerebral-website-tutorial-basic",
+  "version": "0.1.0",
+  "description": "Example app for Cerebral website tutorial",
+  "main": "index.js",
+  "scripts": {
+    "start": "webpack-dev-server --port 3000",
+    "build": "webpack --config webpack.config.production.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/cerebral/cerebral-website-tutorial-basic.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/cerebral/cerebral-website-tutorial-basic/issues"
+  },
+  "homepage": "https://github.com/cerebral/cerebral-website-tutorial-basic#readme",
+  "dependencies": {
+    "babel-core": "^6.20.0",
+    "babel-loader": "^6.2.4",
+    "babel-preset-es2015": "^6.9.0",
+    "babel-preset-react": "^6.5.0",
+    "babel-preset-stage-0": "^6.5.0",
+    "cerebral": "^1.0.0",
+    "cerebral-module-devtools": "^0.7.0",
+    "cerebral-view-react": "^0.12.4",
+    "html-webpack-plugin": "^2.21.0",
+    "react": "^15.1.0",
+    "react-dom": "^15.1.0",
+    "webpack": "^1.13.1",
+    "webpack-dev-server": "^1.14.1"
+  }
+}
