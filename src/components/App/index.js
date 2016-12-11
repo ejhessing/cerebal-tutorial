@@ -3,7 +3,8 @@ import {connect} from 'cerebral-view-react'
 
 export default connect({
   newItemTitle: 'newItemTitle',
-  items: 'items'
+  items: 'items', 
+  title: 'title'
 }, {
   newItemTitleSubmitted: 'newItemTitleSubmitted',
   newItemTitleChanged: 'newItemTitleChanged'
@@ -22,6 +23,7 @@ export default connect({
 
     return (
       <div>
+      <h1>{props.title}</h1>
         <p>Type text and hit enter</p>
         <form onSubmit={onFormSubmit}>
           <input
