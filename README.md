@@ -8,6 +8,7 @@ Survive deadly winters, explore a fog-covered hex island, and find the randomly-
 
 ## Features
 
+### Core Gameplay
 - **Hex Grid Map**: 15x15 procedurally generated hex map with 6 terrain types
 - **Fog of War**: Explore the map to reveal hidden hexes
 - **Resource Management**: Manage Food, Wood, Stone, and Population
@@ -17,6 +18,15 @@ Survive deadly winters, explore a fog-covered hex island, and find the randomly-
 - **Dice-Based Production**: Buildings use dice rolls for production
 - **Random Events**: Encounter traders, discoveries, attacks, and more
 - **Resource Depletion**: Terrain resources deplete over time
+- **Capital Movement**: Relocate your capital once per year (costs resources)
+
+### Visual Polish
+- **Animated Hex Selection**: Pulsing gold ring highlights selected hexes
+- **Building Placement Preview**: Ghost buildings appear when hovering with a building selected
+- **Smooth Camera Controls**: Mouse drag to pan, scroll to zoom, keyboard movement
+- **Professional UI**: Glass-morphism design with backdrop blur and smooth transitions
+- **Start/End Screens**: Beautiful modals for game start and victory/defeat states
+- **Visual Feedback**: Resource counters pulse on changes, smooth animations throughout
 
 ## How to Play
 
@@ -35,9 +45,12 @@ Find and reach the exit hex (marked with a yellow flag) with at least 1 populati
 
 ### Controls
 
-- **Mouse**: Hover over hexes to see information
-- **Click**: Select a hex or building
-- **Arrow Keys**: Pan the camera
+- **Left Click**: Select hex / Place building
+- **Right Click + Drag**: Pan camera around the map
+- **Mouse Wheel**: Zoom in and out (10-50 units)
+- **Arrow Keys / WASD**: Move camera
+- **R Key**: Reset camera to default view
+- **Move Capital Button**: Relocate your capital (once per year, costs 5 wood + 3 food)
 - **End Turn Button**: Advance to the next turn
 
 ### Turn Structure
@@ -77,11 +90,15 @@ Find and reach the exit hex (marked with a yellow flag) with at least 1 populati
 ### Tips
 
 1. Build farms and lumber camps early on preferred terrain for bonuses
-2. Explore aggressively to find the exit
+2. Explore aggressively to find the exit - it's randomly placed far from your start
 3. Build heaters before year 2 to survive escalating winters
-4. Scout towers reveal large areas quickly
-5. Watchtowers protect against animal attacks
-6. Watch resource depletion - move to fresh hexes when needed
+4. Scout towers reveal large areas quickly (2-hex radius)
+5. Watchtowers protect against animal attacks within 2 hexes
+6. Watch resource depletion - move capital to fresh hexes when tiles deplete
+7. Use the building placement preview to plan your layout
+8. Pan the camera with right-click to explore the map efficiently
+9. Keep food and wood stockpiled before each winter
+10. Advanced farms on grassland are very efficient (2-4 food per turn)
 
 ## Building for Production
 
@@ -93,9 +110,10 @@ The built files will be in the `dist/` directory.
 
 ## Tech Stack
 
-- Three.js for 3D rendering
-- Vite for build tooling
-- Vanilla JavaScript (ES modules)
+- **Three.js** (v0.160.0) for 3D hex grid rendering and animations
+- **Vite** (v5.0.0) for fast build tooling and development
+- **Vanilla JavaScript** (ES modules) - No framework dependencies
+- **CSS3** for UI animations and glassmorphism effects
 
 ## License
 
