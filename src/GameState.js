@@ -37,6 +37,15 @@ export class GameState {
 
         // Capital movement tracking
         this.lastCapitalMoveYear = 0; // Track last year capital was moved
+
+        // Statistics tracking
+        this.stats = {
+            foodProduced: 0,
+            woodProduced: 0,
+            stoneProduced: 0,
+            capitalRelocations: 0,
+            populationPeak: 2
+        };
     }
 
     initialize() {
@@ -161,6 +170,10 @@ export class GameState {
                 this.resources[type] + amount,
                 this.resources.maxPopulation
             );
+            // Track population peak
+            if (this.resources[type] > this.stats.populationPeak) {
+                this.stats.populationPeak = this.resources[type];
+            }
         } else if (type === 'maxPopulation') {
             this.resources[type] += amount;
         } else if (type === 'storageCapacity') {
@@ -168,6 +181,11 @@ export class GameState {
         } else {
             const max = this.resources.storageCapacity;
             this.resources[type] = Math.min(this.resources[type] + amount, max);
+
+            // Track production
+            if (type === 'food') this.stats.foodProduced += amount;
+            else if (type === 'wood') this.stats.woodProduced += amount;
+            else if (type === 'stone') this.stats.stoneProduced += amount;
         }
     }
 
@@ -260,6 +278,7 @@ export class GameState {
         // Move capital
         this.capitalPosition = { q, r };
         this.lastCapitalMoveYear = this.year;
+        this.stats.capitalRelocations++;
 
         // Explore adjacent hexes
         const neighbors = this.getNeighbors(q, r);

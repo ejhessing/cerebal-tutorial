@@ -193,6 +193,11 @@ class Game {
     }
 
     onKeyDown(event) {
+        // Don't handle keys if typing in an input field
+        if (event.target.tagName === 'INPUT' || event.target.tagName === 'TEXTAREA') {
+            return;
+        }
+
         const moveSpeed = 2;
         switch(event.key) {
             case 'ArrowLeft':
@@ -220,6 +225,26 @@ class Game {
                 // Reset camera
                 this.camera.position.set(0, 25, 20);
                 this.camera.lookAt(0, 0, 0);
+                break;
+            case 'h':
+            case 'H':
+            case '?':
+                // Toggle help
+                if (this.uiManager) {
+                    this.uiManager.toggleHelp();
+                }
+                break;
+            case 'Tab':
+                // Toggle stats
+                event.preventDefault();
+                if (this.uiManager) {
+                    this.uiManager.toggleStats();
+                }
+                break;
+            case 'Escape':
+                // Close all panels
+                document.getElementById('help-panel').classList.remove('visible');
+                document.getElementById('stats-panel').classList.remove('visible');
                 break;
         }
     }

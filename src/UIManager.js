@@ -36,6 +36,32 @@ export class UIManager {
                 this.selectBuilding(buildingItem.dataset.buildingType);
             }
         });
+
+        // Help button
+        document.getElementById('help-btn').addEventListener('click', () => {
+            this.toggleHelp();
+        });
+
+        // Stats button
+        document.getElementById('stats-btn').addEventListener('click', () => {
+            this.toggleStats();
+        });
+
+        // Close panels when clicking outside
+        document.addEventListener('click', (e) => {
+            const helpPanel = document.getElementById('help-panel');
+            const helpBtn = document.getElementById('help-btn');
+            const statsPanel = document.getElementById('stats-panel');
+            const statsBtn = document.getElementById('stats-btn');
+
+            if (!helpPanel.contains(e.target) && !helpBtn.contains(e.target)) {
+                helpPanel.classList.remove('visible');
+            }
+
+            if (!statsPanel.contains(e.target) && !statsBtn.contains(e.target)) {
+                statsPanel.classList.remove('visible');
+            }
+        });
     }
 
     update() {
@@ -43,6 +69,43 @@ export class UIManager {
         this.updateSeasonDisplay();
         this.renderBuildingMenu();
         this.updateMoveCapitalButton();
+        this.updateStats();
+    }
+
+    toggleHelp() {
+        const panel = document.getElementById('help-panel');
+        panel.classList.toggle('visible');
+
+        // Close stats if open
+        document.getElementById('stats-panel').classList.remove('visible');
+    }
+
+    toggleStats() {
+        const panel = document.getElementById('stats-panel');
+        panel.classList.toggle('visible');
+
+        // Close help if open
+        document.getElementById('help-panel').classList.remove('visible');
+
+        // Update stats when opening
+        if (panel.classList.contains('visible')) {
+            this.updateStats();
+        }
+    }
+
+    updateStats() {
+        const stats = this.gameState.stats;
+        document.getElementById('stat-buildings').textContent = this.gameState.totalBuildings;
+        document.getElementById('stat-explored').textContent = this.gameState.exploredHexes.size;
+        document.getElementById('stat-food-produced').textContent = stats.foodProduced;
+        document.getElementById('stat-wood-produced').textContent = stats.woodProduced;
+        document.getElementById('stat-stone-produced').textContent = stats.stoneProduced;
+        document.getElementById('stat-relocations').textContent = stats.capitalRelocations;
+        document.getElementById('stat-pop-peak').textContent = stats.populationPeak;
+
+        // Update current score
+        this.gameState.calculateScore();
+        document.getElementById('stat-current-score').textContent = this.gameState.score;
     }
 
     updateMoveCapitalButton() {

@@ -489,6 +489,176 @@
             animation: button-press 0.2s ease-in-out;
         }
 
+        /* Help button */
+        #help-btn {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            background: rgba(26, 26, 46, 0.9);
+            border: 2px solid #4a4a6a;
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            font-size: 24px;
+            color: #ffd700;
+            cursor: pointer;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            backdrop-filter: blur(10px);
+        }
+
+        #help-btn:hover {
+            background: rgba(26, 26, 46, 0.95);
+            transform: scale(1.1);
+            box-shadow: 0 6px 8px rgba(0, 0, 0, 0.4);
+        }
+
+        /* Help panel */
+        #help-panel {
+            position: absolute;
+            left: 20px;
+            top: 80px;
+            width: 320px;
+            max-height: calc(100vh - 100px);
+            background: rgba(26, 26, 46, 0.95);
+            border: 2px solid #4a4a6a;
+            border-radius: 10px;
+            padding: 20px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+            backdrop-filter: blur(10px);
+            overflow-y: auto;
+            display: none;
+            z-index: 500;
+        }
+
+        #help-panel.visible {
+            display: block;
+        }
+
+        #help-panel h3 {
+            color: #ffd700;
+            font-size: 18px;
+            margin-bottom: 15px;
+            border-bottom: 2px solid #4a4a6a;
+            padding-bottom: 10px;
+        }
+
+        #help-panel h4 {
+            color: #8af;
+            font-size: 14px;
+            margin-top: 15px;
+            margin-bottom: 8px;
+        }
+
+        #help-panel p, #help-panel ul {
+            font-size: 12px;
+            line-height: 1.6;
+            color: #ccc;
+            margin-bottom: 10px;
+        }
+
+        #help-panel ul {
+            padding-left: 20px;
+        }
+
+        #help-panel li {
+            margin-bottom: 5px;
+        }
+
+        .help-section {
+            margin-bottom: 15px;
+        }
+
+        .key-combo {
+            display: inline-block;
+            background: rgba(74, 74, 106, 0.5);
+            padding: 2px 6px;
+            border-radius: 3px;
+            font-family: monospace;
+            color: #ffd700;
+        }
+
+        /* Stats panel */
+        #stats-btn {
+            position: absolute;
+            bottom: 180px;
+            right: 20px;
+            background: rgba(26, 26, 46, 0.9);
+            border: 2px solid #4a4a6a;
+            border-radius: 8px;
+            padding: 10px 20px;
+            font-size: 14px;
+            font-weight: bold;
+            color: white;
+            cursor: pointer;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+            transition: all 0.2s;
+            backdrop-filter: blur(10px);
+        }
+
+        #stats-btn:hover {
+            background: rgba(26, 26, 46, 0.95);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 8px rgba(0, 0, 0, 0.4);
+        }
+
+        #stats-panel {
+            position: absolute;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%) translateY(100%);
+            width: 400px;
+            background: rgba(26, 26, 46, 0.95);
+            border: 2px solid #4a4a6a;
+            border-radius: 10px;
+            padding: 20px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+            backdrop-filter: blur(10px);
+            z-index: 500;
+            opacity: 0;
+            pointer-events: none;
+            transition: all 0.3s ease;
+        }
+
+        #stats-panel.visible {
+            transform: translateX(-50%) translateY(0);
+            opacity: 1;
+            pointer-events: auto;
+        }
+
+        #stats-panel h3 {
+            color: #ffd700;
+            font-size: 18px;
+            margin-bottom: 15px;
+            border-bottom: 2px solid #4a4a6a;
+            padding-bottom: 10px;
+            text-align: center;
+        }
+
+        .stat-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 8px 0;
+            border-bottom: 1px solid rgba(74, 74, 106, 0.3);
+            font-size: 14px;
+        }
+
+        .stat-row:last-child {
+            border-bottom: none;
+        }
+
+        .stat-label {
+            color: #aaa;
+        }
+
+        .stat-value {
+            color: #fff;
+            font-weight: bold;
+        }
+
         /* Scrollbar styling */
         ::-webkit-scrollbar {
             width: 8px;
@@ -555,6 +725,102 @@
             <div class="action-buttons">
                 <button id="move-capital-btn">Move Capital (5🪵 3🌾)</button>
                 <button id="end-turn-btn">End Turn</button>
+            </div>
+
+            <!-- Help button -->
+            <button id="help-btn" title="Help & Controls">?</button>
+
+            <!-- Help panel -->
+            <div id="help-panel">
+                <h3>Help & Guide</h3>
+
+                <div class="help-section">
+                    <h4>Goal</h4>
+                    <p>Find and reach the exit (yellow flag) with at least 1 survivor before winter kills your colony.</p>
+                </div>
+
+                <div class="help-section">
+                    <h4>Controls</h4>
+                    <ul>
+                        <li><span class="key-combo">Left Click</span> - Select hex / Build</li>
+                        <li><span class="key-combo">Right Click</span> - Pan camera</li>
+                        <li><span class="key-combo">Scroll</span> - Zoom in/out</li>
+                        <li><span class="key-combo">WASD</span> / <span class="key-combo">Arrows</span> - Move camera</li>
+                        <li><span class="key-combo">R</span> - Reset camera view</li>
+                    </ul>
+                </div>
+
+                <div class="help-section">
+                    <h4>Seasons</h4>
+                    <ul>
+                        <li><strong>Spring:</strong> Normal production</li>
+                        <li><strong>Summer:</strong> +1 food bonus</li>
+                        <li><strong>Fall:</strong> 20% animal attacks</li>
+                        <li><strong>Winter:</strong> -50% food, need wood for heat</li>
+                    </ul>
+                </div>
+
+                <div class="help-section">
+                    <h4>Building Tips</h4>
+                    <ul>
+                        <li>Build on matching terrain for bonuses</li>
+                        <li>Tier 2 unlocks at 5 buildings</li>
+                        <li>Tier 3 unlocks at 10 buildings</li>
+                        <li>Build heaters before year 2</li>
+                        <li>Scout towers reveal 2-hex radius</li>
+                    </ul>
+                </div>
+
+                <div class="help-section">
+                    <h4>Important</h4>
+                    <ul>
+                        <li>Population needs 1 food per turn</li>
+                        <li>Winter needs wood for heating</li>
+                        <li>Winters get harder each year</li>
+                        <li>Resources deplete to 50% production</li>
+                        <li>Move capital costs 5🪵 + 3🌾</li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- Stats button -->
+            <button id="stats-btn">📊 Statistics</button>
+
+            <!-- Stats panel -->
+            <div id="stats-panel">
+                <h3>Game Statistics</h3>
+                <div class="stat-row">
+                    <span class="stat-label">Buildings Built:</span>
+                    <span class="stat-value" id="stat-buildings">0</span>
+                </div>
+                <div class="stat-row">
+                    <span class="stat-label">Hexes Explored:</span>
+                    <span class="stat-value" id="stat-explored">0</span>
+                </div>
+                <div class="stat-row">
+                    <span class="stat-label">Total Food Produced:</span>
+                    <span class="stat-value" id="stat-food-produced">0</span>
+                </div>
+                <div class="stat-row">
+                    <span class="stat-label">Total Wood Produced:</span>
+                    <span class="stat-value" id="stat-wood-produced">0</span>
+                </div>
+                <div class="stat-row">
+                    <span class="stat-label">Total Stone Produced:</span>
+                    <span class="stat-value" id="stat-stone-produced">0</span>
+                </div>
+                <div class="stat-row">
+                    <span class="stat-label">Capital Relocations:</span>
+                    <span class="stat-value" id="stat-relocations">0</span>
+                </div>
+                <div class="stat-row">
+                    <span class="stat-label">Population Peak:</span>
+                    <span class="stat-value" id="stat-pop-peak">2</span>
+                </div>
+                <div class="stat-row">
+                    <span class="stat-label">Current Score:</span>
+                    <span class="stat-value" id="stat-current-score">1000</span>
+                </div>
             </div>
 
             <!-- Tooltip -->
