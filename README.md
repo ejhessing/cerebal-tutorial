@@ -20,13 +20,15 @@ Survive deadly winters, explore a fog-covered hex island, and find the randomly-
 - **Resource Depletion**: Terrain resources deplete over time
 - **Capital Movement**: Relocate your capital once per year (costs resources)
 
-### Visual Polish
+### Visual Polish & UX
 - **Animated Hex Selection**: Pulsing gold ring highlights selected hexes
 - **Building Placement Preview**: Ghost buildings appear when hovering with a building selected
 - **Smooth Camera Controls**: Mouse drag to pan, scroll to zoom, keyboard movement
 - **Professional UI**: Glass-morphism design with backdrop blur and smooth transitions
 - **Start/End Screens**: Beautiful modals for game start and victory/defeat states
 - **Visual Feedback**: Resource counters pulse on changes, smooth animations throughout
+- **In-Game Help System**: Press H or ? to view comprehensive game guide
+- **Statistics Tracking**: Press Tab to view detailed gameplay statistics
 
 ## How to Play
 
@@ -45,11 +47,21 @@ Find and reach the exit hex (marked with a yellow flag) with at least 1 populati
 
 ### Controls
 
+#### Mouse Controls
 - **Left Click**: Select hex / Place building
 - **Right Click + Drag**: Pan camera around the map
 - **Mouse Wheel**: Zoom in and out (10-50 units)
+
+#### Keyboard Shortcuts
 - **Arrow Keys / WASD**: Move camera
 - **R Key**: Reset camera to default view
+- **H or ? Key**: Toggle help panel
+- **Tab Key**: Toggle statistics panel
+- **Escape Key**: Close all panels
+
+#### UI Buttons
+- **? Button** (top-left): Open in-game help guide
+- **📊 Statistics Button** (right side): View gameplay statistics
 - **Move Capital Button**: Relocate your capital (once per year, costs 5 wood + 3 food)
 - **End Turn Button**: Advance to the next turn
 
@@ -89,16 +101,18 @@ Find and reach the exit hex (marked with a yellow flag) with at least 1 populati
 
 ### Tips
 
-1. Build farms and lumber camps early on preferred terrain for bonuses
-2. Explore aggressively to find the exit - it's randomly placed far from your start
-3. Build heaters before year 2 to survive escalating winters
-4. Scout towers reveal large areas quickly (2-hex radius)
-5. Watchtowers protect against animal attacks within 2 hexes
-6. Watch resource depletion - move capital to fresh hexes when tiles deplete
-7. Use the building placement preview to plan your layout
-8. Pan the camera with right-click to explore the map efficiently
-9. Keep food and wood stockpiled before each winter
-10. Advanced farms on grassland are very efficient (2-4 food per turn)
+1. **Press H or ?** to view the in-game help guide at any time
+2. Build farms and lumber camps early on preferred terrain for bonuses
+3. Explore aggressively to find the exit - it's randomly placed far from your start
+4. Build heaters before year 2 to survive escalating winters
+5. Scout towers reveal large areas quickly (2-hex radius)
+6. Watchtowers protect against animal attacks within 2 hexes
+7. Watch resource depletion - move capital to fresh hexes when tiles deplete
+8. Use the building placement preview to plan your layout
+9. Pan the camera with right-click to explore the map efficiently
+10. Keep food and wood stockpiled before each winter
+11. Advanced farms on grassland are very efficient (2-4 food per turn)
+12. **Press Tab** to view your statistics and track progress
 
 ## Building for Production
 
