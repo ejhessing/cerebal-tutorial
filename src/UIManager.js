@@ -73,13 +73,22 @@ export class UIManager {
         this.renderBuildingMenu();
     }
 
-    updateResourceDisplay() {
+    updateResourceDisplay(changedResources = null) {
         const res = this.gameState.resources;
         document.getElementById('food-count').textContent = res.food;
         document.getElementById('wood-count').textContent = res.wood;
         document.getElementById('stone-count').textContent = res.stone;
         document.getElementById('population-count').textContent =
             `${res.population}/${res.maxPopulation}`;
+
+        // Add pulse animation to changed resources
+        if (changedResources) {
+            changedResources.forEach(resourceType => {
+                const element = document.getElementById(`${resourceType}-count`).parentElement;
+                element.classList.add('updated');
+                setTimeout(() => element.classList.remove('updated'), 300);
+            });
+        }
     }
 
     updateSeasonDisplay() {
@@ -271,12 +280,24 @@ export class UIManager {
     }
 
     showGameOver() {
-        const message = this.gameState.won ?
-            `🎉 Victory! You escaped with ${this.gameState.resources.population} survivors!\nScore: ${this.gameState.score}` :
-            `💀 Game Over! Your colony perished.\nScore: ${this.gameState.score}`;
-
         setTimeout(() => {
-            alert(message);
-        }, 100);
+            const modal = document.getElementById('gameover-modal');
+            const title = document.getElementById('gameover-title');
+            const message = document.getElementById('gameover-message');
+            const score = document.getElementById('gameover-score');
+
+            if (this.gameState.won) {
+                title.textContent = '🎉 VICTORY! 🎉';
+                message.textContent = `You escaped with ${this.gameState.resources.population} survivor${this.gameState.resources.population > 1 ? 's' : ''}!`;
+                title.style.color = '#4ade80';
+            } else {
+                title.textContent = '💀 DEFEAT 💀';
+                message.textContent = 'Your colony perished...';
+                title.style.color = '#f87171';
+            }
+
+            score.textContent = `Final Score: ${this.gameState.score}`;
+            modal.classList.remove('hidden');
+        }, 500);
     }
 }

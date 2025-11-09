@@ -61,6 +61,13 @@
             display: flex;
             gap: 30px;
             box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+            backdrop-filter: blur(10px);
+            transition: all 0.3s ease;
+        }
+
+        #resource-panel:hover {
+            background: rgba(26, 26, 46, 0.95);
+            box-shadow: 0 6px 10px rgba(0, 0, 0, 0.4);
         }
 
         .resource-item {
@@ -90,6 +97,13 @@
             padding: 15px 20px;
             min-width: 180px;
             box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+            backdrop-filter: blur(10px);
+            transition: all 0.3s ease;
+        }
+
+        #season-panel:hover {
+            background: rgba(26, 26, 46, 0.95);
+            box-shadow: 0 6px 10px rgba(0, 0, 0, 0.4);
         }
 
         #season-panel h3 {
@@ -116,6 +130,12 @@
             max-height: calc(100vh - 200px);
             overflow-y: auto;
             box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+            backdrop-filter: blur(10px);
+            transition: all 0.3s ease;
+        }
+
+        #building-menu:hover {
+            background: rgba(26, 26, 46, 0.95);
         }
 
         #building-menu h2 {
@@ -248,6 +268,11 @@
             transform: translateY(0);
         }
 
+        #end-turn-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
         #move-capital-btn {
             background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
             border: none;
@@ -309,6 +334,161 @@
             margin: 4px 0;
         }
 
+        /* Modal overlays */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.9);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 10000;
+        }
+
+        .modal-overlay.hidden {
+            display: none;
+        }
+
+        .modal-content {
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+            border: 3px solid #4a4a6a;
+            border-radius: 20px;
+            padding: 40px;
+            max-width: 600px;
+            text-align: center;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.8);
+        }
+
+        .modal-content h1 {
+            font-size: 48px;
+            margin-bottom: 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .modal-content h2 {
+            font-size: 32px;
+            margin-bottom: 15px;
+            color: #ffd700;
+        }
+
+        .modal-content p {
+            font-size: 18px;
+            margin: 15px 0;
+            color: #ccc;
+            line-height: 1.6;
+        }
+
+        .modal-content .controls-list {
+            text-align: left;
+            margin: 20px auto;
+            max-width: 400px;
+            font-size: 14px;
+            color: #aaa;
+        }
+
+        .modal-content .controls-list div {
+            margin: 8px 0;
+        }
+
+        .modal-content .controls-list strong {
+            color: #ffd700;
+            min-width: 150px;
+            display: inline-block;
+        }
+
+        .modal-btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border: none;
+            border-radius: 10px;
+            padding: 15px 50px;
+            font-size: 20px;
+            font-weight: bold;
+            color: white;
+            cursor: pointer;
+            margin: 10px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+            transition: all 0.2s;
+        }
+
+        .modal-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 8px rgba(0, 0, 0, 0.4);
+        }
+
+        .modal-btn.secondary {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+        }
+
+        .score-display {
+            font-size: 36px;
+            color: #ffd700;
+            margin: 20px 0;
+            font-weight: bold;
+        }
+
+        /* Floating text animations */
+        @keyframes float-up {
+            0% {
+                transform: translateY(0);
+                opacity: 1;
+            }
+            100% {
+                transform: translateY(-50px);
+                opacity: 0;
+            }
+        }
+
+        .floating-text {
+            position: absolute;
+            font-size: 20px;
+            font-weight: bold;
+            pointer-events: none;
+            z-index: 1000;
+            animation: float-up 1.5s ease-out forwards;
+        }
+
+        .floating-text.positive {
+            color: #4ade80;
+        }
+
+        .floating-text.negative {
+            color: #f87171;
+        }
+
+        /* Pulse animation for updated values */
+        @keyframes pulse {
+            0%, 100% {
+                transform: scale(1);
+            }
+            50% {
+                transform: scale(1.2);
+            }
+        }
+
+        .resource-item.updated {
+            animation: pulse 0.3s ease-in-out;
+        }
+
+        /* Button press animation */
+        @keyframes button-press {
+            0%, 100% {
+                transform: scale(1);
+            }
+            50% {
+                transform: scale(0.95);
+            }
+        }
+
+        .building-item.building-placed {
+            animation: button-press 0.2s ease-in-out;
+        }
+
         /* Scrollbar styling */
         ::-webkit-scrollbar {
             width: 8px;
@@ -328,7 +508,7 @@
             background: rgba(74, 74, 106, 0.8);
         }
     </style>
-  <script type="module" crossorigin src="/assets/index-kIUOOjld.js"></script>
+  <script type="module" crossorigin src="/assets/index-BZSLQAtU.js"></script>
 </head>
 <body>
     <div id="game-container">
@@ -380,6 +560,47 @@
 
             <!-- Tooltip -->
             <div id="tooltip"></div>
+        </div>
+    </div>
+
+    <!-- Start Screen Modal -->
+    <div id="start-modal" class="modal-overlay">
+        <div class="modal-content">
+            <h1>🎮 HEX ESCAPE 🎮</h1>
+            <p>A turn-based hex grid survival strategy game</p>
+
+            <div style="margin: 30px 0;">
+                <p><strong>Goal:</strong> Find and reach the exit before winter kills your colony!</p>
+                <p>Manage resources, build structures, and survive escalating winters.</p>
+            </div>
+
+            <div class="controls-list">
+                <h3 style="text-align: center; color: #ffd700; margin-bottom: 15px;">Controls</h3>
+                <div><strong>Left Click:</strong> Select hex / Build</div>
+                <div><strong>Right Click + Drag:</strong> Pan camera</div>
+                <div><strong>Mouse Wheel:</strong> Zoom in/out</div>
+                <div><strong>Arrow Keys / WASD:</strong> Move camera</div>
+                <div><strong>R Key:</strong> Reset camera view</div>
+            </div>
+
+            <button class="modal-btn" onclick="window.gameInstance.startGame()">
+                START GAME
+            </button>
+        </div>
+    </div>
+
+    <!-- Game Over Modal -->
+    <div id="gameover-modal" class="modal-overlay hidden">
+        <div class="modal-content">
+            <h2 id="gameover-title">Game Over</h2>
+            <p id="gameover-message"></p>
+            <div class="score-display" id="gameover-score">Score: 0</div>
+
+            <div style="margin-top: 30px;">
+                <button class="modal-btn" onclick="window.gameInstance.restartGame()">
+                    PLAY AGAIN
+                </button>
+            </div>
         </div>
     </div>
 

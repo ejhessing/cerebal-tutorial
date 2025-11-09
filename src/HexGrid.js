@@ -18,6 +18,13 @@ export class HexGrid {
 
         // Capital marker
         this.capitalMarker = null;
+
+        // Selection ring
+        this.selectionRing = null;
+        this.selectionRingScale = 1.0;
+
+        // Building preview
+        this.buildingPreview = null;
     }
 
     createHexGeometry() {
@@ -177,15 +184,51 @@ export class HexGrid {
             }
         }
 
+        // Remove old selection ring
+        if (this.selectionRing) {
+            this.scene.remove(this.selectionRing);
+            this.selectionRing = null;
+        }
+
         // Set new selection
         this.selectedHex = { q, r };
         const mesh = this.hexMeshes.find(m => m.userData.q === q && m.userData.r === r);
         if (mesh) {
             mesh.material.color = new THREE.Color(0xffaa00);
+
+            // Add animated selection ring
+            const position = this.axialToWorld(q, r);
+            const ringGeometry = new THREE.RingGeometry(this.hexSize * 0.9, this.hexSize * 1.1, 6);
+            ringGeometry.rotateX(-Math.PI / 2);
+            ringGeometry.rotateZ(Math.PI / 6);
+
+            const ringMaterial = new THREE.MeshBasicMaterial({
+                color: 0xffd700,
+                side: THREE.DoubleSide,
+                transparent: true,
+                opacity: 0.6
+            });
+
+            this.selectionRing = new THREE.Mesh(ringGeometry, ringMaterial);
+            this.selectionRing.position.set(position.x, 0.15, position.z);
+            this.scene.add(this.selectionRing);
+
+            // Animate the ring
+            this.animateSelectionRing();
         }
     }
 
-    setHover(q, r) {
+    animateSelectionRing() {
+        if (!this.selectionRing) return;
+
+        this.selectionRingScale = 1.0 + Math.sin(Date.now() * 0.003) * 0.1;
+        this.selectionRing.scale.set(this.selectionRingScale, 1, this.selectionRingScale);
+        this.selectionRing.material.opacity = 0.4 + Math.sin(Date.now() * 0.003) * 0.2;
+
+        requestAnimationFrame(() => this.animateSelectionRing());
+    }
+
+    setHover(q, r, showBuildingPreview = false) {
         this.hoveredHex = { q, r };
         const mesh = this.hexMeshes.find(m => m.userData.q === q && m.userData.r === r);
 
@@ -196,6 +239,58 @@ export class HexGrid {
                 const baseColor = this.getTerrainColor(hexData.terrain);
                 mesh.material.color = new THREE.Color(baseColor).multiplyScalar(1.3);
             }
+
+            // Show building preview
+            if (showBuildingPreview && !this.gameState.getBuilding(q, r)) {
+                const hexData = this.gameState.getHex(q, r);
+                if (hexData.terrain !== 'water') {
+                    this.showBuildingPreview(q, r);
+                }
+            }
+        }
+    }
+
+    showBuildingPreview(q, r) {
+        // Remove old preview
+        this.clearBuildingPreview();
+
+        const position = this.axialToWorld(q, r);
+        const geometry = new THREE.BoxGeometry(0.8, 0.6, 0.8);
+        const material = new THREE.MeshStandardMaterial({
+            color: 0x8b4513,
+            roughness: 0.9,
+            transparent: true,
+            opacity: 0.5
+        });
+
+        this.buildingPreview = new THREE.Mesh(geometry, material);
+        this.buildingPreview.position.set(position.x, 0.4, position.z);
+        this.scene.add(this.buildingPreview);
+
+        // Add roof preview
+        const roofGeometry = new THREE.ConeGeometry(0.6, 0.4, 4);
+        const roofMaterial = new THREE.MeshStandardMaterial({
+            color: 0x654321,
+            roughness: 0.9,
+            transparent: true,
+            opacity: 0.5
+        });
+        const roofPreview = new THREE.Mesh(roofGeometry, roofMaterial);
+        roofPreview.position.set(position.x, 0.9, position.z);
+        roofPreview.rotation.y = Math.PI / 4;
+        this.scene.add(roofPreview);
+
+        // Store both parts
+        this.buildingPreview.userData.roof = roofPreview;
+    }
+
+    clearBuildingPreview() {
+        if (this.buildingPreview) {
+            this.scene.remove(this.buildingPreview);
+            if (this.buildingPreview.userData.roof) {
+                this.scene.remove(this.buildingPreview.userData.roof);
+            }
+            this.buildingPreview = null;
         }
     }
 
@@ -215,6 +310,7 @@ export class HexGrid {
             }
         }
         this.hoveredHex = null;
+        this.clearBuildingPreview();
     }
 
     // Add building visual to hex
