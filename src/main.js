@@ -147,6 +147,11 @@ class Game {
             return;
         }
 
+        // Defensive check: ensure components are initialized
+        if (!this.hexGrid || !this.uiManager) {
+            return;
+        }
+
         this.mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
         this.mouse.y = -(event.clientY / window.innerHeight) * 2 + 1;
 
@@ -157,7 +162,7 @@ class Game {
         this.hexGrid.clearHover();
         if (intersects.length > 0) {
             const hexData = intersects[0].object.userData;
-            const showPreview = this.uiManager && this.uiManager.selectedBuilding !== null;
+            const showPreview = this.uiManager.selectedBuilding !== null;
             this.hexGrid.setHover(hexData.q, hexData.r, showPreview);
             this.uiManager.showTooltip(event.clientX, event.clientY, hexData);
         } else {
@@ -193,6 +198,11 @@ class Game {
     }
 
     onMouseClick(event) {
+        // Defensive check: ensure components are initialized
+        if (!this.hexGrid || !this.uiManager || !this.gameState) {
+            return;
+        }
+
         this.raycaster.setFromCamera(this.mouse, this.camera);
         const intersects = this.raycaster.intersectObjects(this.hexGrid.hexMeshes);
 
