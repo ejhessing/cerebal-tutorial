@@ -186,7 +186,9 @@ export class TurnManager {
                 const deficit = Math.abs(this.gameState.resources.wood);
                 this.gameState.resources.wood = 0;
 
-                const popLoss = Math.min(pop, Math.ceil(deficit / 3));
+                // Re-read population after potential starvation
+                const currentPop = this.gameState.resources.population;
+                const popLoss = Math.min(currentPop, Math.ceil(deficit / 3));
                 this.gameState.removeResource('population', popLoss);
                 this.uiManager.addLog(
                     `⚠ Freezing! Lost ${popLoss} population`,
@@ -217,13 +219,6 @@ export class TurnManager {
 
     triggerRandomEvent() {
         const events = [
-            {
-                name: 'Abundance',
-                effect: () => {
-                    this.uiManager.addLog('🌟 Abundance! +50% production next turn', 'log-event');
-                    // Would need to implement next turn modifier
-                }
-            },
             {
                 name: 'Blight',
                 effect: () => {

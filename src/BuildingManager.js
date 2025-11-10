@@ -242,7 +242,11 @@ export class BuildingManager {
 
             // Convert roll to production
             let production = 0;
-            if (building.productionType === 'stone') {
+
+            // Roll of 0 produces nothing (terrain too unfavorable)
+            if (roll === 0) {
+                production = 0;
+            } else if (building.productionType === 'stone') {
                 // Quarry: 1-3=1, 4-5=2, 6+=3
                 if (roll <= 3) production = 1;
                 else if (roll <= 5) production = 2;
