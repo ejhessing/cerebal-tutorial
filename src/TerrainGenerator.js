@@ -67,9 +67,16 @@ export class TerrainGenerator {
         const edgeFunc = edges[Math.floor(Math.random() * edges.length)];
         let pos = edgeFunc();
 
-        // Ensure it's valid
-        while (!this.gameState.isValidHex(pos.q, pos.r)) {
+        // Ensure it's valid with max attempts to prevent infinite loop
+        let attempts = 0;
+        while (!this.gameState.isValidHex(pos.q, pos.r) && attempts < 1000) {
             pos = edgeFunc();
+            attempts++;
+        }
+
+        // Fallback to origin if somehow no valid position found
+        if (!this.gameState.isValidHex(pos.q, pos.r)) {
+            pos = { q: 0, r: 0 };
         }
 
         return pos;
@@ -112,15 +119,50 @@ export class TerrainGenerator {
             attempts++;
         }
 
-        // Fallback if no position found
+        // Fallback if no position found - find nearest valid non-water hex
         if (!exitPos) {
-            exitPos = {
-                q: -startQ,
-                r: -startR
-            };
+            exitPos = { q: -startQ, r: -startR };
+
+            // Validate fallback position
+            if (!this.gameState.isValidHex(exitPos.q, exitPos.r)) {
+                // Try center of map
+                exitPos = { q: 0, r: 0 };
+            }
+
+            // Ensure fallback is not water
+            const fallbackHex = this.gameState.getHex(exitPos.q, exitPos.r);
+            if (fallbackHex && fallbackHex.terrain === 'water') {
+                // Search spiral outward from fallback position for non-water
+                for (let dist = 1; dist <= radius; dist++) {
+                    const neighbors = this.getSpiralHexes(exitPos.q, exitPos.r, dist);
+                    for (const hex of neighbors) {
+                        if (this.gameState.isValidHex(hex.q, hex.r)) {
+                            const hexData = this.gameState.getHex(hex.q, hex.r);
+                            if (hexData && hexData.terrain !== 'water') {
+                                exitPos = hex;
+                                break;
+                            }
+                        }
+                    }
+                    if (fallbackHex.terrain !== 'water') break;
+                }
+            }
         }
 
         return exitPos;
+    }
+
+    // Helper to get hexes in a ring at distance dist
+    getSpiralHexes(centerQ, centerR, dist) {
+        const hexes = [];
+        for (let q = -dist; q <= dist; q++) {
+            for (let r = -dist; r <= dist; r++) {
+                if (Math.abs(q) === dist || Math.abs(r) === dist || Math.abs(-q - r) === dist) {
+                    hexes.push({ q: centerQ + q, r: centerR + r });
+                }
+            }
+        }
+        return hexes;
     }
 
     selectTerrain(q, r) {
