@@ -48,9 +48,6 @@ class Game {
         // Event listeners
         this.setupEventListeners();
 
-        // Store instance globally for modal buttons
-        window.gameInstance = this;
-
         // Don't start game yet - wait for user to click start button
         // Animation loop
         this.animate();
@@ -70,12 +67,26 @@ class Game {
         // Hide game over modal
         document.getElementById('gameover-modal').classList.add('hidden');
 
+        // Properly dispose of old HexGrid to prevent memory leaks
+        if (this.hexGrid) {
+            this.hexGrid.dispose();
+        }
+
         // Reset game state
         this.gameState = new GameState();
 
-        // Clear scene
+        // Clear scene - properly dispose of remaining objects
         while(this.scene.children.length > 0) {
-            this.scene.remove(this.scene.children[0]);
+            const object = this.scene.children[0];
+            if (object.geometry) object.geometry.dispose();
+            if (object.material) {
+                if (Array.isArray(object.material)) {
+                    object.material.forEach(material => material.dispose());
+                } else {
+                    object.material.dispose();
+                }
+            }
+            this.scene.remove(object);
         }
 
         // Re-add lighting
@@ -111,6 +122,10 @@ class Game {
 
         // Camera controls (arrow keys)
         window.addEventListener('keydown', (e) => this.onKeyDown(e));
+
+        // Modal button event listeners
+        document.getElementById('start-game-btn').addEventListener('click', () => this.startGame());
+        document.getElementById('restart-game-btn').addEventListener('click', () => this.restartGame());
     }
 
     onWindowResize() {

@@ -22,9 +22,17 @@ export class HexGrid {
         // Selection ring
         this.selectionRing = null;
         this.selectionRingScale = 1.0;
+        this.selectionRingAnimationId = null;
 
         // Building preview
         this.buildingPreview = null;
+
+        // Exit markers tracking
+        this.exitMarkers = [];
+        this.exitMarkerAnimationId = null;
+
+        // Building visuals tracking
+        this.buildingVisuals = new Map(); // key: "q,r", value: {building, roof}
     }
 
     createHexGeometry() {
@@ -113,6 +121,12 @@ export class HexGrid {
     }
 
     addExitMarker(position) {
+        // Check if marker already exists at this position
+        const existingMarker = this.exitMarkers.find(m =>
+            m.position.x === position.x && m.position.z === position.z
+        );
+        if (existingMarker) return;
+
         const geometry = new THREE.ConeGeometry(0.3, 1.5, 4);
         const material = new THREE.MeshStandardMaterial({
             color: 0xffff00,
@@ -122,15 +136,31 @@ export class HexGrid {
 
         const marker = new THREE.Mesh(geometry, material);
         marker.position.set(position.x, 1, position.z);
+        marker.userData.baseY = 1;
+        marker.userData.basePosition = { x: position.x, z: position.z };
         this.scene.add(marker);
+        this.exitMarkers.push(marker);
 
-        // Add pulsing animation
-        const animate = () => {
-            marker.position.y = 1 + Math.sin(Date.now() * 0.003) * 0.2;
+        // Start animation loop only if not already running
+        if (!this.exitMarkerAnimationId) {
+            this.animateExitMarkers();
+        }
+    }
+
+    animateExitMarkers() {
+        this.exitMarkers.forEach(marker => {
+            marker.position.y = marker.userData.baseY + Math.sin(Date.now() * 0.003) * 0.2;
             marker.rotation.y += 0.02;
-            requestAnimationFrame(animate);
-        };
-        animate();
+        });
+
+        this.exitMarkerAnimationId = requestAnimationFrame(() => this.animateExitMarkers());
+    }
+
+    stopExitMarkerAnimation() {
+        if (this.exitMarkerAnimationId) {
+            cancelAnimationFrame(this.exitMarkerAnimationId);
+            this.exitMarkerAnimationId = null;
+        }
     }
 
     // Convert axial coordinates to world position
@@ -186,7 +216,10 @@ export class HexGrid {
 
         // Remove old selection ring
         if (this.selectionRing) {
+            this.stopSelectionRingAnimation();
             this.scene.remove(this.selectionRing);
+            this.selectionRing.geometry.dispose();
+            this.selectionRing.material.dispose();
             this.selectionRing = null;
         }
 
@@ -219,13 +252,23 @@ export class HexGrid {
     }
 
     animateSelectionRing() {
-        if (!this.selectionRing) return;
+        if (!this.selectionRing) {
+            this.stopSelectionRingAnimation();
+            return;
+        }
 
         this.selectionRingScale = 1.0 + Math.sin(Date.now() * 0.003) * 0.1;
         this.selectionRing.scale.set(this.selectionRingScale, 1, this.selectionRingScale);
         this.selectionRing.material.opacity = 0.4 + Math.sin(Date.now() * 0.003) * 0.2;
 
-        requestAnimationFrame(() => this.animateSelectionRing());
+        this.selectionRingAnimationId = requestAnimationFrame(() => this.animateSelectionRing());
+    }
+
+    stopSelectionRingAnimation() {
+        if (this.selectionRingAnimationId) {
+            cancelAnimationFrame(this.selectionRingAnimationId);
+            this.selectionRingAnimationId = null;
+        }
     }
 
     setHover(q, r, showBuildingPreview = false) {
@@ -337,6 +380,79 @@ export class HexGrid {
         roof.position.set(position.x, 0.9, position.z);
         roof.rotation.y = Math.PI / 4;
         this.scene.add(roof);
+
+        // Track building visuals for cleanup
+        this.buildingVisuals.set(`${q},${r}`, { building, roof });
+    }
+
+    // Cleanup method for disposing Three.js resources
+    dispose() {
+        // Stop all animations
+        this.stopSelectionRingAnimation();
+        this.stopExitMarkerAnimation();
+
+        // Dispose hex meshes
+        this.hexMeshes.forEach(mesh => {
+            mesh.geometry.dispose();
+            mesh.material.dispose();
+            this.scene.remove(mesh);
+        });
+        this.hexMeshes = [];
+
+        // Dispose hex geometry
+        if (this.hexGeometry) {
+            this.hexGeometry.dispose();
+        }
+
+        // Dispose selection ring
+        if (this.selectionRing) {
+            this.selectionRing.geometry.dispose();
+            this.selectionRing.material.dispose();
+            this.scene.remove(this.selectionRing);
+            this.selectionRing = null;
+        }
+
+        // Dispose building preview
+        if (this.buildingPreview) {
+            this.buildingPreview.geometry.dispose();
+            this.buildingPreview.material.dispose();
+            this.scene.remove(this.buildingPreview);
+            if (this.buildingPreview.userData.roof) {
+                this.buildingPreview.userData.roof.geometry.dispose();
+                this.buildingPreview.userData.roof.material.dispose();
+                this.scene.remove(this.buildingPreview.userData.roof);
+            }
+            this.buildingPreview = null;
+        }
+
+        // Dispose building visuals
+        this.buildingVisuals.forEach(({ building, roof }) => {
+            building.geometry.dispose();
+            building.material.dispose();
+            this.scene.remove(building);
+            roof.geometry.dispose();
+            roof.material.dispose();
+            this.scene.remove(roof);
+        });
+        this.buildingVisuals.clear();
+
+        // Dispose exit markers
+        this.exitMarkers.forEach(marker => {
+            marker.geometry.dispose();
+            marker.material.dispose();
+            this.scene.remove(marker);
+        });
+        this.exitMarkers = [];
+
+        // Dispose capital marker
+        if (this.capitalMarker) {
+            this.capitalMarker.children.forEach(child => {
+                child.geometry.dispose();
+                child.material.dispose();
+            });
+            this.scene.remove(this.capitalMarker);
+            this.capitalMarker = null;
+        }
     }
 
     // Add/update capital marker visual

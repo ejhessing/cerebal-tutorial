@@ -279,10 +279,11 @@ export class BuildingManager {
     }
 
     // Check and update resource depletion
+    // Returns true if hex became depleted this turn
     updateDepletion(hexData, building, production) {
         if (!building.productionType || building.productionType === 'maxPopulation' ||
             building.productionType === 'storageCapacity') {
-            return;
+            return false;
         }
 
         const resourceType = building.productionType;
@@ -293,7 +294,10 @@ export class BuildingManager {
             if (hexData.resources[resourceType] <= 0 && !hexData.depleted) {
                 hexData.depleted = true;
                 hexData.resources[resourceType] = 0;
+                return true; // Hex became depleted
             }
         }
+
+        return false;
     }
 }
