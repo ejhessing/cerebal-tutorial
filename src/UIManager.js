@@ -6,7 +6,7 @@ export class UIManager {
         this.gameState = gameState;
         this.hexGrid = hexGrid;
         this.buildingManager = new BuildingManager(gameState, hexGrid);
-        this.turnManager = new TurnManager(gameState, hexGrid, this);
+        this.turnManager = new TurnManager(gameState, hexGrid, this, this.buildingManager);
 
         this.selectedBuilding = null;
         this.selectedHexPos = null;

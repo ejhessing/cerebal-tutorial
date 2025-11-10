@@ -48,9 +48,6 @@ class Game {
         // Event listeners
         this.setupEventListeners();
 
-        // Store instance globally for modal buttons
-        window.gameInstance = this;
-
         // Don't start game yet - wait for user to click start button
         // Animation loop
         this.animate();
@@ -70,12 +67,26 @@ class Game {
         // Hide game over modal
         document.getElementById('gameover-modal').classList.add('hidden');
 
+        // Properly dispose of old HexGrid to prevent memory leaks
+        if (this.hexGrid) {
+            this.hexGrid.dispose();
+        }
+
         // Reset game state
         this.gameState = new GameState();
 
-        // Clear scene
+        // Clear scene - properly dispose of remaining objects
         while(this.scene.children.length > 0) {
-            this.scene.remove(this.scene.children[0]);
+            const object = this.scene.children[0];
+            if (object.geometry) object.geometry.dispose();
+            if (object.material) {
+                if (Array.isArray(object.material)) {
+                    object.material.forEach(material => material.dispose());
+                } else {
+                    object.material.dispose();
+                }
+            }
+            this.scene.remove(object);
         }
 
         // Re-add lighting
@@ -111,6 +122,10 @@ class Game {
 
         // Camera controls (arrow keys)
         window.addEventListener('keydown', (e) => this.onKeyDown(e));
+
+        // Modal button event listeners
+        document.getElementById('start-game-btn').addEventListener('click', () => this.startGame());
+        document.getElementById('restart-game-btn').addEventListener('click', () => this.restartGame());
     }
 
     onWindowResize() {
@@ -132,6 +147,11 @@ class Game {
             return;
         }
 
+        // Defensive check: ensure components are initialized
+        if (!this.hexGrid || !this.uiManager) {
+            return;
+        }
+
         this.mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
         this.mouse.y = -(event.clientY / window.innerHeight) * 2 + 1;
 
@@ -142,7 +162,7 @@ class Game {
         this.hexGrid.clearHover();
         if (intersects.length > 0) {
             const hexData = intersects[0].object.userData;
-            const showPreview = this.uiManager && this.uiManager.selectedBuilding !== null;
+            const showPreview = this.uiManager.selectedBuilding !== null;
             this.hexGrid.setHover(hexData.q, hexData.r, showPreview);
             this.uiManager.showTooltip(event.clientX, event.clientY, hexData);
         } else {
@@ -178,6 +198,11 @@ class Game {
     }
 
     onMouseClick(event) {
+        // Defensive check: ensure components are initialized
+        if (!this.hexGrid || !this.uiManager || !this.gameState) {
+            return;
+        }
+
         this.raycaster.setFromCamera(this.mouse, this.camera);
         const intersects = this.raycaster.intersectObjects(this.hexGrid.hexMeshes);
 

@@ -1,8 +1,9 @@
 export class TurnManager {
-    constructor(gameState, hexGrid, uiManager) {
+    constructor(gameState, hexGrid, uiManager, buildingManager) {
         this.gameState = gameState;
         this.hexGrid = hexGrid;
         this.uiManager = uiManager;
+        this.buildingManager = buildingManager;
 
         this.heaterCount = 0;
         this.watchtowerPositions = [];
@@ -67,14 +68,20 @@ export class TurnManager {
             // Skip if no production
             if (building.diceRolls === 0) return;
 
-            // Calculate production
-            let production = this.rollProduction(building, hexData);
+            // Calculate production using BuildingManager
+            let production = this.buildingManager.rollProduction(building, hexData);
 
             // Apply season modifiers
             production = this.applySeasonModifiers(production, building);
 
-            // Update depletion
-            this.updateDepletion(hexData, building, production);
+            // Update depletion using BuildingManager
+            const becameDepleted = this.buildingManager.updateDepletion(hexData, building, production);
+            if (becameDepleted) {
+                this.uiManager.addLog(
+                    `Hex (${hexData.q}, ${hexData.r}) depleted! Production -50%`,
+                    'log-event'
+                );
+            }
 
             // Add to totals
             if (building.productionType === 'food') {
@@ -101,58 +108,6 @@ export class TurnManager {
         }
     }
 
-    rollProduction(building, hexData) {
-        let total = 0;
-
-        for (let i = 0; i < building.diceRolls; i++) {
-            let roll = Math.floor(Math.random() * 6) + 1;
-
-            // Apply terrain bonus/penalty
-            if (building.preferredTerrain) {
-                if (hexData.terrain === building.preferredTerrain) {
-                    roll += 1;
-                } else if (building.type !== 'huntingLodge') {
-                    roll -= 1;
-                }
-            }
-
-            // Advanced farm bonus
-            if (building.advanced && hexData.terrain === building.preferredTerrain) {
-                roll += 1;
-            }
-
-            roll = Math.max(0, roll);
-
-            // Convert roll to production
-            let production = 0;
-            if (building.productionType === 'stone') {
-                if (roll <= 3) production = 1;
-                else if (roll <= 5) production = 2;
-                else production = 3;
-            } else if (building.type === 'huntingLodge') {
-                if (roll <= 3) production = 1;
-                else production = 2;
-            } else if (building.advanced) {
-                if (roll <= 2) production = 2;
-                else if (roll <= 4) production = 3;
-                else production = 4;
-            } else {
-                if (roll <= 2) production = 1;
-                else if (roll <= 4) production = 2;
-                else production = 3;
-            }
-
-            total += production;
-        }
-
-        // Apply depletion penalty
-        if (hexData.depleted) {
-            total = Math.floor(total * 0.5);
-        }
-
-        return total;
-    }
-
     applySeasonModifiers(production, building) {
         const season = this.gameState.season;
 
@@ -174,28 +129,6 @@ export class TurnManager {
         }
 
         return production;
-    }
-
-    updateDepletion(hexData, building, production) {
-        if (!building.productionType || building.productionType === 'maxPopulation' ||
-            building.productionType === 'storageCapacity') {
-            return;
-        }
-
-        const resourceType = building.productionType;
-
-        if (hexData.resources[resourceType] !== undefined) {
-            hexData.resources[resourceType] -= production;
-
-            if (hexData.resources[resourceType] <= 0 && !hexData.depleted) {
-                hexData.depleted = true;
-                hexData.resources[resourceType] = 0;
-                this.uiManager.addLog(
-                    `Hex (${hexData.q}, ${hexData.r}) depleted! Production -50%`,
-                    'log-event'
-                );
-            }
-        }
     }
 
     consumptionPhase() {
@@ -253,7 +186,9 @@ export class TurnManager {
                 const deficit = Math.abs(this.gameState.resources.wood);
                 this.gameState.resources.wood = 0;
 
-                const popLoss = Math.min(pop, Math.ceil(deficit / 3));
+                // Re-read population after potential starvation
+                const currentPop = this.gameState.resources.population;
+                const popLoss = Math.min(currentPop, Math.ceil(deficit / 3));
                 this.gameState.removeResource('population', popLoss);
                 this.uiManager.addLog(
                     `⚠ Freezing! Lost ${popLoss} population`,
@@ -284,13 +219,6 @@ export class TurnManager {
 
     triggerRandomEvent() {
         const events = [
-            {
-                name: 'Abundance',
-                effect: () => {
-                    this.uiManager.addLog('🌟 Abundance! +50% production next turn', 'log-event');
-                    // Would need to implement next turn modifier
-                }
-            },
             {
                 name: 'Blight',
                 effect: () => {

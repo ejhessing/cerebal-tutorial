@@ -210,6 +210,11 @@ export class GameState {
 
     // Check win condition
     checkWinCondition() {
+        // Defensive check: ensure game is initialized
+        if (!this.capitalPosition || !this.exitHex) {
+            return false;
+        }
+
         if (this.capitalPosition.q === this.exitHex.q &&
             this.capitalPosition.r === this.exitHex.r &&
             this.resources.population > 0) {
@@ -245,6 +250,11 @@ export class GameState {
     }
 
     moveCapital(q, r) {
+        // Defensive check: ensure game is initialized
+        if (!this.capitalPosition) {
+            return { success: false, message: 'Game not initialized' };
+        }
+
         if (!this.canMoveCapital()) {
             return { success: false, message: 'Can only relocate once per year' };
         }
@@ -266,8 +276,11 @@ export class GameState {
             return { success: false, message: 'Not enough resources (need 5 wood, 3 food)' };
         }
 
-        // Check if water
+        // Check if hex exists and is not water
         const hexData = this.getHex(q, r);
+        if (!hexData) {
+            return { success: false, message: 'Invalid hex' };
+        }
         if (hexData.terrain === 'water') {
             return { success: false, message: 'Cannot move to water' };
         }

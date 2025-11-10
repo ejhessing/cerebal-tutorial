@@ -242,7 +242,11 @@ export class BuildingManager {
 
             // Convert roll to production
             let production = 0;
-            if (building.productionType === 'stone') {
+
+            // Roll of 0 produces nothing (terrain too unfavorable)
+            if (roll === 0) {
+                production = 0;
+            } else if (building.productionType === 'stone') {
                 // Quarry: 1-3=1, 4-5=2, 6+=3
                 if (roll <= 3) production = 1;
                 else if (roll <= 5) production = 2;
@@ -279,10 +283,11 @@ export class BuildingManager {
     }
 
     // Check and update resource depletion
+    // Returns true if hex became depleted this turn
     updateDepletion(hexData, building, production) {
         if (!building.productionType || building.productionType === 'maxPopulation' ||
             building.productionType === 'storageCapacity') {
-            return;
+            return false;
         }
 
         const resourceType = building.productionType;
@@ -293,7 +298,10 @@ export class BuildingManager {
             if (hexData.resources[resourceType] <= 0 && !hexData.depleted) {
                 hexData.depleted = true;
                 hexData.resources[resourceType] = 0;
+                return true; // Hex became depleted
             }
         }
+
+        return false;
     }
 }
